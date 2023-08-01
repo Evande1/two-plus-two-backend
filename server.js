@@ -22,3 +22,8 @@ app.get('/', (req, res) => {
 app.listen(3000, () => {
     console.log("Server is listening on port 3000");
 });
+
+// const UserRoute = require(./routes/User);
+const CouponRoute = require('./routes/Coupon');
+
+app.use('/api/coupon', CouponRoute);
