@@ -5,6 +5,7 @@ app.use(bodyParser.urlencoded({ extended: true }))
 app.use(bodyParser.json())
 const dbConfig = require('./config/database.config.js');
 const mongoose = require('mongoose');
+const { scrapeData } = require('./cheerio.js');
 
 mongoose.Promise = global.Promise;
 
@@ -17,8 +18,14 @@ mongoose.connect(dbConfig.url, {
     process.exit();
 });
 app.get('/', (req, res) => {
-    res.json({"message": "Hello Crud Node Express"});
+    res.json({message: "Hello Crud Node Express"});
 });
-app.listen(3000, () => {
-    console.log("Server is listening on port 3000");
+app.listen(5000, () => {
+    console.log("Server is listening on port 5000");
+});
+app.get('/cheerio', (req, res) => {
+    // Scraping code
+    scrapeData().then((data) => {
+        res.json({"data": data});
+    })
 });
