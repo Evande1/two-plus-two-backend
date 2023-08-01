@@ -5,7 +5,9 @@ app.use(bodyParser.urlencoded({ extended: true }))
 app.use(bodyParser.json())
 const dbConfig = require('./config/database.config.js');
 const mongoose = require('mongoose');
-const { scrapeData } = require('./cheerio.js');
+
+const cheerio = require('./cheerio.js');
+const selenium_webdriver = require('./selenium-webdriver.js');
 
 mongoose.Promise = global.Promise;
 
@@ -18,14 +20,18 @@ mongoose.connect(dbConfig.url, {
     process.exit();
 });
 app.get('/', (req, res) => {
-    res.json({message: "Hello Crud Node Express"});
+    res.json({"message": "Hello Crud Node Express"});
 });
 app.listen(5000, () => {
     console.log("Server is listening on port 5000");
 });
-app.get('/cheerio', (req, res) => {
+app.get('/cheerio', async (req, res) => {
     // Scraping code
-    scrapeData().then((data) => {
-        res.json({"data": data});
-    })
+    const data = await cheerio.scrapeData();
+    res.json({"data": data});
+});
+app.get('/selenium-webdriver', async (req, res) => {
+    // Scraping code
+    const data = await selenium_webdriver.scrapeData();
+    res.json({"data": data});
 });

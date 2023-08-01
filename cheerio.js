@@ -25,7 +25,7 @@ async function scrapeData() {
                 'url': '',
             }
 
-            const title = $(el).find('div.coupon-card-btn-main').find('a.share-btn-mobile').attr('data-title')
+            const title = $(el).find('div.coupon-card-btn-main > a.share-btn-mobile').attr('data-title')
             if (title) {
                 obj.title = title
             }
