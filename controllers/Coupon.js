@@ -1,4 +1,7 @@
-const CouponModel = require('../models/Coupon');
+const CouponModel = require('../models/CouponModel');
+const axios = require("axios");
+const cheerio = require("cheerio");
+const fs = require("fs");
 
 // create a new fav coupon
 exports.addFavourites = async (req, res) => {
@@ -35,7 +38,37 @@ exports.addFavourites = async (req, res) => {
         });
     });
 };
-// get all coupons from website
-exports.search = (req, res) => {
-    
+// get kfc coupons
+exports.searchKFC = async (req, res) => {
+    try {
+        const coupons = await scrapeKFCcoupons();
+        res.status(200).json(coupons);
+    } catch (err) {
+        res.status(404).json({ message: err.message })
+    }
 }
+
+async function scrapeKFCcoupons() {
+      try {
+        const url = "https://www.kfc.com.sg/Coupon/Promotion";
+        // Fetch HTML of the page we want to scrape
+        const { data } = await axios.get(url);
+        // Load HTML we fetched in the previous line
+        const $ = cheerio.load(data);
+        const items = [];
+        const listItems = $('.coupon-box > .row > .col-xs-12 > .row > .col-xs-12 > .row > .col-xs-6');
+        listItems.each((idx, el) => {
+            const coupon = { title: "", url: url, type: "KFC", expiry: ""};
+            coupon.title = $(el).attr("data-promo-title");
+            items.push(coupon);
+            // console.log(coupon.title);
+            // photo? 
+            // expiry date
+        })
+        console.dir(items);
+        return items;
+
+      } catch (err) {
+        console.error(err);
+      }
+    }
