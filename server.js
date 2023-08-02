@@ -5,6 +5,13 @@ app.use(bodyParser.urlencoded({ extended: true }))
 app.use(bodyParser.json())
 const dbConfig = require('./config/database.config.js');
 const mongoose = require('mongoose');
+const cors = require('cors');
+
+//can also use origin to specify domains
+app.use(cors());
+//enable pre-flight across the board
+app.options('*', cors());
+
 
 mongoose.Promise = global.Promise;
 
