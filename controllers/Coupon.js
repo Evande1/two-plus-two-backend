@@ -60,6 +60,10 @@ async function scrapeKFCcoupons() {
         listItems.each((idx, el) => {
             const coupon = { title: "", url: url, type: "KFC", expiry: ""};
             coupon.title = $(el).attr("data-promo-title");
+            const expiry = $(el).find('.menu-item > .name-desc > .description').text();
+            if (expiry.indexOf('Expires on') != -1) {
+                coupon.expiry = expiry.substring(expiry.indexOf('Expires on') + 12)
+            }
             items.push(coupon);
             // console.log(coupon.title);
             // photo? 
