@@ -76,3 +76,58 @@ async function scrapeKFCcoupons() {
         console.error(err);
       }
     }
+
+// get bk coupons
+exports.searchBK = async (req, res) => {
+    try {
+        const coupons = await scrapeBKcoupons();
+        res.status(200).json(coupons);
+    } catch (err) {
+        res.status(404).json({ message: err.message })
+    }
+}
+
+// Async function which scrapes the data
+async function scrapeBKcoupons() {
+    try {
+        // URL of the page we want to scrape
+        const url = "https://www.bkcoupons.sg";
+        // Fetch HTML of the page we want to scrape
+        const { data } = await axios.get(url);
+        // Load HTML we fetched in the previous line
+        const $ = cheerio.load(data);
+
+        const $hp_coupon_item = $('div.hp-coupon-item').not('#shareWithFriends')
+        const items = []
+
+        $hp_coupon_item.each((idx, el) => {
+            // console.log(pretty($(el).html(), { ocd: true }))
+            const obj = {
+                title: '',
+                url: '',
+                type: 'BK',
+                expiry: ''
+            }
+
+            const title = $(el).find('div.coupon-card-btn-main > a.share-btn-mobile').attr('data-title')
+            if (title) {
+                obj.title = title
+            }
+
+            const href = $(el).find('a').attr('href')
+            if (href && href.charAt(0) === "/") {
+                obj.url = url + href
+            }
+
+            items.push(obj)
+            // console.log(obj)
+        })
+
+        console.dir(items);
+
+        return items
+
+    } catch (err) {
+        console.error(err);
+    }
+}
