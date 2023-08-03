@@ -2,9 +2,11 @@ const CouponModel = require('../models/CouponModel');
 const axios = require("axios");
 const cheerio = require("cheerio");
 const fs = require("fs");
+const coupon = require('../models/CouponModel');
 
 // create a new fav coupon
 exports.addFavourites = async (req, res) => {
+    console.log(req.body)
     if (!req.body.title) {
         return res.status(400).send({
             message: "Coupon title cannot be empty"
@@ -31,13 +33,28 @@ exports.addFavourites = async (req, res) => {
         res.send({
             message: "Coupon added successfully",
             user: data
-        }).catch(err => {
-            res.status(500).send({
-                message: err.message || "Some error occurred while adding the coupon"
-            });
+        })
+    }).catch(err => {
+        res.status(500).send({
+            message: err.message || "Some error occurred while adding the coupon"
         });
     });
 };
+
+exports.getFavourites = async (req, res) => {
+    coupon.find({}).select({
+        title: 1,
+        type: 1,
+        url: 1,
+        expiry: 1,
+        _id: 0,
+    }).then(data => {
+        res.status(200).json(data);
+    }).catch(err => {
+        res.status(404).json({ message: err.message })
+    })
+}
+
 // get kfc coupons
 exports.searchKFC = async (req, res) => {
     try {
