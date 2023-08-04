@@ -5,6 +5,13 @@ app.use(bodyParser.urlencoded({ extended: true }))
 app.use(bodyParser.json())
 const dbConfig = require('./config/database.config.js');
 const mongoose = require('mongoose');
+const cors = require('cors');
+
+//can also use origin to specify domains
+app.use(cors());
+//enable pre-flight across the board
+app.options('*', cors());
+
 
 mongoose.Promise = global.Promise;
 
@@ -22,3 +29,8 @@ app.get('/', (req, res) => {
 app.listen(3000, () => {
     console.log("Server is listening on port 3000");
 });
+
+// const UserRoute = require(./routes/User);
+const CouponRoute = require('./routes/Coupon');
+
+app.use('/api/coupon', CouponRoute);
