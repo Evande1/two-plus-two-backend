@@ -186,3 +186,69 @@ async function scrapeBKcoupons() {
         console.error(err);
     }
 }
+
+// get scoop coupons
+exports.searchSCP = async (req, res) => {
+	try {
+		const coupons = await scrapeSCPcoupons();
+		res.status(200).json(coupons);
+	} catch (err) {
+		res.status(404).json({ message: err.message });
+	}
+};
+
+async function scrapeSCPcoupons() {
+	try {
+		const main_url = "https://scoopwholefoodsshop.com";
+        const sub_url=  "/collections/promotion"
+        const url = main_url + sub_url;
+		// Fetch HTML of the page we want to scrape
+		const { data } = await axios.get(url);
+		// Load HTML we fetched in the previous line
+		const $ = cheerio.load(data);
+		const maxPgNum = parseInt($(".pagination--number").last().text());
+        //console.log(maxPgNum);
+		const items = [];
+
+		for (let i = 1; i < maxPgNum + 1; i++) {
+			const pgNum = i.toString();
+            //console.log(i);
+            const url = `https://scoopwholefoodsshop.com/collections/promotion?page=${pgNum}#collection-root`;
+			// Fetch HTML of the page we want to scrape
+			const { data } = await axios.get(url);
+			// Load HTML we fetched in the previous line
+			const $ = cheerio.load(data);
+
+			const listItems = $(".product--root");
+			//console.log(listItems.length);
+
+			listItems.each((idx, el) => {
+				const coupon = {
+					title: "",
+					url: url,
+					type: "SCOOP",
+					expiry: "",
+				};
+
+                const href = $(el).find('a').attr('href')
+                if (href && href.charAt(0) === "/") {
+                    coupon.url = main_url + href
+                }
+
+				const title = $(el).find('a > .product--details-container > .product--details > .product--details-wrapper > .product--title').text();
+				//console.log(title);
+                const price = $(el).find('a > .product--details-container > .product--details > .product--price-container > .product--price-wrapper > .product--price').text();
+				//console.log(title, price);
+				coupon.title = title + price;
+				items.push(coupon);
+				//console.log(coupon.title);
+			});
+		}
+
+		//console.dir(items);
+        //console.log(items.length);
+		return items;
+	} catch (err) {
+		console.error(err);
+	}
+}
