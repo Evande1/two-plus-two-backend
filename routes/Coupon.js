@@ -7,5 +7,6 @@ router.get('/kfc', couponController.searchKFC);
 router.get('/bk', couponController.searchBK);
 router.post('/addfavourites', couponController.addFavourites);
 router.get('/getfavourites', couponController.getFavourites);
+router.post('/removefavourites', couponController.removeFavourites);
 
 module.exports = router;

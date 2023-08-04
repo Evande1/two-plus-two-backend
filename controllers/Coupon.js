@@ -29,6 +29,17 @@ exports.addFavourites = async (req, res) => {
         expiry: req.body.expiry
     });
 
+    if (await CouponModel.exists({
+        title: req.body.title,
+        type: req.body.type,
+        url: req.body.url,
+        expiry: req.body.expiry
+    })) {
+        return res.status(400).send({
+            message: "Coupon already exists"
+        });
+    }
+
     await coupon.save().then(data => {
         res.send({
             message: "Coupon added successfully",
@@ -53,6 +64,33 @@ exports.getFavourites = async (req, res) => {
     }).catch(err => {
         res.status(404).json({ message: err.message })
     })
+}
+
+exports.removeFavourites = async (req, res) => {
+    console.log(req.body)
+    const couponId = await CouponModel.exists({
+        title: req.body.title,
+        type: req.body.type,
+        url: req.body.url,
+        expiry: req.body.expiry
+    })
+
+    if (couponId === null) {
+        return res.status(400).send({
+            message: "Coupon does not exist"
+        });
+    }
+
+    CouponModel.findOneAndDelete(couponId).then(data => {
+        res.send({
+            message: "Coupon removed successfully",
+            user: data
+        })
+    }).catch(err => {
+        res.status(500).send({
+            message: err.message || "Some error occurred while deleting the coupon"
+        });
+    });
 }
 
 // get kfc coupons
